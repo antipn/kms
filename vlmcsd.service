@@ -1,0 +1,9 @@
+[Unit]
+Description=MS KMS Server
+After=network-online.target
+Wants=network-online.target
+[Service]
+Type=forking
+ExecStart=/opt/kms/vlmcsd -i /opt/kms/vlmcsd.ini
+[Install]
+WantedBy=multi-user.target
