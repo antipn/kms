@@ -1,0 +1,61 @@
+#  run Ubuntu in docker and working with it
+# docker run -ti --rm antipn/ubuntu:22.04 /bin/bash
+
+
+######################################################################
+# download project
+# unpack it 
+# compile binaries
+# compile process in kms-r02/kms-r02 folder by command "make"
+# run it from /opt/kms by ./vlmcs
+######################################################################
+version: '3.9'
+services:
+  kms:
+    build: .
+    image: antipn/ubuntu:22.04
+    # restart: "no"
+    # networks:
+    #   - kms-network
+    tty: true
+    stdin_open: true
+    ports:
+      - "1688:1688"
+    
+    #for iteractin conteiner withput commands
+    # entrypoint: sh -c "/bin/sh"
+
+    command: >
+      sh -c "
+      wget -O kms-r02.tar.gz https://github.com/antipn/kms/archive/refs/tags/r02.tar.gz &&
+      mkdir kms-r02 &&
+      tar -C kms-r02 -xvf kms-r02.tar.gz &&
+      mkdir -p /opt/kms &&
+      cp /kms-r02/kms-r02/etc/vlmcsd.ini /opt/kms/ &&
+      cp /kms-r02/kms-r02/etc/vlmcsd.kmd /opt/kms/ &&
+      cd kms-r02/kms-r02 &&
+      CC=gcc &&
+      make &&
+      cd / &&
+      cp kms-r02/kms-r02/bin/vlmcsd /opt/kms &&
+      cp kms-r02/kms-r02/bin/vlmcs /opt/kms &&
+      cd /opt/kms &&
+      ./vlmcsd &&
+      ./vlmcs &&
+      /bin/sh"
+    container_name: kms-server
+# networks:
+#   kms-network:
+#     driver: host
+
+# !
+# this is for ubuntu server not for docker!
+# in Docker is not allow to use services, this is not for containers purpose (we can push it but dont need it)
+# useradd -s /sbin/nologin -d /run/kms/ -m -r kms-user &&
+#       chown -R kms-user:kms-user /opt/kms &&
+#       touch /var/log/kms.log &&
+#       chown kms-user:kms-user /var/log/kms.log &&
+#       cp /kms-r02/kms-r02/vlmcsd.service /etc/systemd/system/kms.service &&
+#       systemctl start vlmcsd &&
+#       systemctl enable vlmcsd &&
+#       netstat -tunlp | grep vlmcsd
