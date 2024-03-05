@@ -1,0 +1,20 @@
+#Basic ubuntu with updates and wgwet installed on it
+
+FROM ubuntu:22.04
+# install updates + wget + compiler 
+RUN  apt-get update \
+  && apt-get install -y wget \
+  && apt-get install -y gcc \
+  && apt-get install -y make
+#stay interactive shell for non exiting from container
+CMD ["/bin/bash"]    
+#   && rm -rf /var/lib/apt/lists/*
+EXPOSE 1688
+
+LABEL "author"="Antipkin Nikolay"
+LABEL "email"="palmer@bk.ru"
+
+
+# send to hub image based in docker file in directory
+#  docker build -f dockerfile.kms -t antipn/ubuntu:24.04 .
+# docker push antipn/ubuntu:24.04
